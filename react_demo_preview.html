@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麦当劳营养生活 - 实时数据更新版</title>
+    <!-- Load React and Babel for Demo -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --mcd-red: #DA291C;
+            --mcd-yellow: #FFC72C;
+            --mcd-orange: #FF6B35;
+            --card-bg: #ffffff;
+            --text-main: #292929;
+            --text-muted: #666666;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .brand-logo {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--mcd-red);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Filter Styles */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 30px;
+            background: white;
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn.active {
+            background: var(--mcd-red);
+            color: white;
+            box-shadow: 0 4px 15px rgba(218, 41, 28, 0.3);
+        }
+
+        /* Grid Layout */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        /* Card Styles */
+        .menu-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-visual {
+            height: 180px;
+            background: linear-gradient(135deg, var(--mcd-yellow) 0%, var(--mcd-orange) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            position: relative;
+        }
+
+        .calorie-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--mcd-red);
+            backdrop-filter: blur(4px);
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--mcd-red);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .card-body {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .product-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+            padding-right: 10px;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--mcd-red);
+            white-space: nowrap;
+        }
+
+        .nutrition-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .nutri-box {
+            background: #fcfcfc;
+            border: 1px solid #f0f0f0;
+            padding: 12px 8px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .nutri-value {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--mcd-red);
+        }
+
+        .nutri-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* Table Section */
+        .data-section {
+            background: white;
+            padding: 40px;
+            border-radius: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .data-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scroll-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            text-align: left;
+            padding: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #f8f8f8;
+            font-weight: 600;
+        }
+
+        .row-name { color: var(--text-main); font-size: 1.05rem; }
+        .row-price { color: var(--mcd-red); font-weight: 700; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 15px; }
+            .header h1 { font-size: 1.8rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .data-section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const MENU_DATA = [
+            // 新品上新
+            { id: 'n1', name: '泰会浪大鸡排堡', price: 27, category: 'burger', emoji: '🍔', isNew: true, nutrition: { kcal: 510, protein: 25, fat: 25, carbs: 45 } },
+            { id: 'n2', name: '泰能打打抛猪猪堡', price: 25, category: 'burger', emoji: '🍛', isNew: true, nutrition: { kcal: 450, protein: 20, fat: 20, carbs: 40 } },
+            { id: 'n3', name: '泰兰德蘸酱鸡球', price: 16.5, category: 'snack', emoji: '🍗', isNew: true, nutrition: { kcal: 250, protein: 15, fat: 12, carbs: 20 } },
+            { id: 'n4', name: '萌橘醒醒气泡美式', price: 20, category: 'drink', emoji: '🍊', isNew: true, nutrition: { kcal: 110, protein: 1, fat: 0, carbs: 28 } },
+            
+            // 经典汉堡
+            { id: 'h1', name: '巨无霸', price: 29, category: 'burger', emoji: '🍔', nutrition: { kcal: 513, protein: 27, fat: 26, carbs: 42 } },
+            { id: 'h2', name: '麦辣鸡腿汉堡', price: 25.5, category: 'burger', emoji: '🌶️', nutrition: { kcal: 485, protein: 24, fat: 24, carbs: 42 } },
+            { id: 'h3', name: '板烧鸡腿堡', price: 26.5, category: 'burger', emoji: '🍗', nutrition: { kcal: 391, protein: 23, fat: 17, carbs: 35 } },
+            { id: 'h4', name: '双层吉士汉堡', price: 25, category: 'burger', emoji: '🧀', nutrition: { kcal: 429, protein: 27, fat: 22, carbs: 31 } },
+            { id: 'h5', name: '麦香鱼', price: 24, category: 'burger', emoji: '🐟', nutrition: { kcal: 325, protein: 16, fat: 13, carbs: 35 } },
+            { id: 'h6', name: '德克萨斯三层肉霸堡', price: 29, category: 'burger', emoji: '🥓', isNew: true, nutrition: { kcal: 620, protein: 35, fat: 32, carbs: 38 } },
+            
+            // 小食/派
+            { id: 's1', name: '中薯条', price: 15.5, category: 'snack', emoji: '🍟', nutrition: { kcal: 289, protein: 4, fat: 12, carbs: 38 } },
+            { id: 's2', name: '麦辣鸡翅(2块)', price: 16, category: 'snack', emoji: '🍗', nutrition: { kcal: 224, protein: 13, fat: 15, carbs: 9 } },
+            { id: 's3', name: '麦乐鸡(5块)', price: 15, category: 'snack', emoji: '🍖', nutrition: { kcal: 213, protein: 12, fat: 12, carbs: 13 } },
+            { id: 'p1', name: '苹果香蕉双拼迷你派', price: 10, category: 'snack', emoji: '🥧', isNew: true, nutrition: { kcal: 160, protein: 2, fat: 8, carbs: 22 } },
+            { id: 'p2', name: '红豆年糕风味派', price: 10, category: 'snack', emoji: '🥧', isNew: true, nutrition: { kcal: 180, protein: 3, fat: 7, carbs: 25 } },
+            { id: 'p3', name: '香芋派/菠萝派', price: 9, category: 'snack', emoji: '🥧', nutrition: { kcal: 232, protein: 2, fat: 12, carbs: 28 } },
+            
+            // 饮品
+            { id: 'd1', name: '可口可乐(中)', price: 11, category: 'drink', emoji: '🥤', nutrition: { kcal: 147, protein: 0, fat: 0, carbs: 36 } },
+            { id: 'd2', name: '无糖可口可乐(中)', price: 11, category: 'drink', emoji: '🥤', nutrition: { kcal: 0, protein: 0, fat: 0, carbs: 1 } },
+            { id: 'd3', name: '鲜萃冰咖', price: 13, category: 'drink', emoji: '☕', nutrition: { kcal: 13, protein: 1, fat: 0, carbs: 0 } },
+            { id: 'd4', name: '麦咖啡™冰奶铁(大)', price: 25, category: 'drink', emoji: '☕', nutrition: { kcal: 162, protein: 9, fat: 7, carbs: 15 } },
+            { id: 'd5', name: '浓浓抹茶雪冰(大)', price: 27, category: 'drink', emoji: '🍵', nutrition: { kcal: 339, protein: 8, fat: 12, carbs: 48 } },
+            { id: 'd6', name: '浓浓黑巧雪冰(大)', price: 27, category: 'drink', emoji: '🍫', nutrition: { kcal: 444, protein: 11, fat: 14, carbs: 65 } },
+            { id: 'd7', name: '锡兰红茶', price: 12, category: 'drink', emoji: '🍵', nutrition: { kcal: 2, protein: 0, fat: 0, carbs: 0 } },
+            { id: 'd8', name: '纯牛奶(盒装)', price: 11.5, category: 'drink', emoji: '🥛', nutrition: { kcal: 129, protein: 7, fat: 7, carbs: 10 } },
+            { id: 'd9', name: '100% 苹果汁(盒装)', price: 13, category: 'drink', emoji: '🧃', nutrition: { kcal: 110, protein: 0, fat: 0, carbs: 26 } },
+            { id: 'd10', name: '纯悦包装饮用水', price: 8, category: 'drink', emoji: '💧', nutrition: { kcal: 0, protein: 0, fat: 0, carbs: 0 } },
+            
+            // 甜品
+            { id: 't1', name: '奥利奥麦旋风', price: 16, category: 'dessert', emoji: '🌀', nutrition: { kcal: 266, protein: 5, fat: 9, carbs: 40 } },
+            { id: 't2', name: '云朵棉花糖麦旋风', price: 17, category: 'dessert', emoji: '☁️', isNew: true, nutrition: { kcal: 280, protein: 4, fat: 10, carbs: 45 } },
+            { id: 't3', name: '朱古力/草莓新地', price: 13.5, category: 'dessert', emoji: '🍨', nutrition: { kcal: 282, protein: 5, fat: 9, carbs: 44 } },
+        ];
+
+        const CATEGORIES = [
+            { id: 'all', label: '全部菜单' },
+            { id: 'burger', label: '经典汉堡' },
+            { id: 'snack', label: '美味小食' },
+            { id: 'drink', label: '清爽饮品' },
+            { id: 'dessert', label: '甜品系列' },
+        ];
+
+        function NutritionBox({ label, value, unit }) {
+            return (
+                <div className="nutri-box">
+                    <span className="nutri-value">{value}{unit}</span>
+                    <span className="nutri-label">{label}</span>
+                </div>
+            );
+        }
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('all');
+
+            const filteredItems = useMemo(() => {
+                return activeTab === 'all' 
+                    ? MENU_DATA 
+                    : MENU_DATA.filter(item => item.category === activeTab);
+            }, [activeTab]);
+
+            return (
+                <div className="container">
+                    <header className="header">
+                        <span className="brand-logo">🍟</span>
+                        <h1>麦当劳实时营养生活</h1>
+                        <p>中国地区实时在售数据 | 包含泰式新品与派Day活动</p>
+                    </header>
+
+                    <nav className="filters">
+                        {CATEGORIES.map(cat => (
+                            <button 
+                                key={cat.id} 
+                                className={`filter-btn ${activeTab === cat.id ? 'active' : ''}`}
+                                onClick={() => setActiveTab(cat.id)}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                    </nav>
+
+                    <main className="menu-grid">
+                        {filteredItems.map(item => (
+                            <article key={item.id} className="menu-card">
+                                <div className="card-visual">
+                                    {item.emoji}
+                                    {item.isNew && <span className="new-badge">New</span>}
+                                    <span className="calorie-tag">{item.nutrition.kcal} kcal</span>
+                                </div>
+                                <div className="card-body">
+                                    <div className="card-header">
+                                        <h3 className="product-name">{item.name}</h3>
+                                        <span className="product-price">¥{item.price.toFixed(1)}</span>
+                                    </div>
+                                    <div className="nutrition-info">
+                                        <NutritionBox label="蛋白质" value={item.nutrition.protein} unit="g" />
+                                        <NutritionBox label="脂肪" value={item.nutrition.fat} unit="g" />
+                                        <NutritionBox label="碳水" value={item.nutrition.carbs} unit="g" />
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </main>
+
+                    <section className="data-section">
+                        <h2>📊 实时成分明细表</h2>
+                        <div className="scroll-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>餐品名称</th>
+                                        <th>实时价格</th>
+                                        <th>热量 (kcal)</th>
+                                        <th>蛋白质 (g)</th>
+                                        <th>脂肪 (g)</th>
+                                        <th>碳水 (g)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredItems.map(item => (
+                                        <tr key={item.id}>
+                                            <td className="row-name">{item.name} {item.isNew && <span style={{color: 'var(--mcd-red)', fontSize: '0.7rem'}}>● 新</span>}</td>
+                                            <td className="row-price">¥{item.price.toFixed(1)}</td>
+                                            <td>{item.nutrition.kcal}</td>
+                                            <td>{item.nutrition.protein}</td>
+                                            <td>{item.nutrition.fat}</td>
+                                            <td>{item.nutrition.carbs}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <footer style={{textAlign: 'center', marginTop: '60px', color: '#999', fontSize: '0.8rem'}}>
+                        <p>© 2026 McDonald's China Real-time Guide | 自动更新版</p>
+                        <p style={{marginTop: '5px'}}>数据源自官方 MCP Server，仅供参考，请以门店实际供应为准</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Ignore MCP config (contains secrets)
+.mcp.json
+
+# System files
+.DS_Store
+Thumbs.db

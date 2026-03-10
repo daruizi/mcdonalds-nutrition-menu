@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>麦当劳菜单 - McDonald's Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #DA291C 0%, #FF6B35 100%);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(218, 41, 28, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #FFC72C;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #DA291C;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: #DA291C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .menu-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .card-image {
+            height: 200px;
+            background: linear-gradient(135deg, #FFC72C 0%, #FF6B35 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .food-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+        }
+
+        .price-tag {
+            background: linear-gradient(135deg, #DA291C 0%, #FF6B35 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            white-space: nowrap;
+        }
+
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .nutrition-item {
+            background: #f8f8f8;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nutrition-item:hover {
+            background: #FFC72C;
+            transform: scale(1.05);
+        }
+
+        .nutrition-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #DA291C;
+        }
+
+        .nutrition-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .calorie-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #DA291C;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+        }
+
+        .category-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 5px solid #DA291C;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            margin-top: 50px;
+        }
+
+        .nutrition-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        .nutrition-table th,
+        .nutrition-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nutrition-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #DA291C;
+        }
+
+        .nutrition-table tr:hover {
+            background: #fff9f0;
+        }
+
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .nutrition-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🍟</div>
+        <h1>麦当劳营养菜单</h1>
+        <p>McDonald's Nutrition Menu | 详细营养成分与热量信息</p>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterCategory('all')">全部</button>
+        <button class="filter-btn" onclick="filterCategory('burger')">汉堡</button>
+        <button class="filter-btn" onclick="filterCategory('breakfast')">早餐</button>
+        <button class="filter-btn" onclick="filterCategory('snack')">小食</button>
+        <button class="filter-btn" onclick="filterCategory('drink')">饮品</button>
+        <button class="filter-btn" onclick="filterCategory('dessert')">甜品</button>
+        <button class="filter-btn" onclick="filterCategory('coffee')">咖啡</button>
+    </div>
+
+    <div id="menu-container">
+        <!-- 早餐系列 -->
+        <div class="category-section" data-category="breakfast">
+            <h2 class="category-title">🌅 早餐系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">🥪</div>
+                    <span class="calorie-badge">308 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">猪柳麦满分</span>
+                            <span class="price-tag">¥18</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">16g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">16g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">24g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">781mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">213mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1288kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍳</div>
+                    <span class="calorie-badge">387 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">猪柳蛋麦满分</span>
+                            <span class="price-tag">¥21</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">23g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">21g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">25g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">846mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">243mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1618kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🥓</div>
+                    <span class="calorie-badge">260 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">烟肉蛋麦满分</span>
+                            <span class="price-tag">¥19</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">16g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">10g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">24g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">483mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">238mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1089kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🧈</div>
+                    <span class="calorie-badge">361 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">大脆鸡扒麦满分</span>
+                            <span class="price-tag">¥17</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">16g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">17g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">35g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">804mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">130mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1510kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 汉堡系列 -->
+        <div class="category-section" data-category="burger">
+            <h2 class="category-title">🍔 汉堡系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">🍔</div>
+                    <span class="calorie-badge">513 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">巨无霸</span>
+                            <span class="price-tag">¥25</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">27g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">26g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">42g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">961mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">171mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">2146kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🌶️</div>
+                    <span class="calorie-badge">485 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">麦辣鸡腿汉堡</span>
+                            <span class="price-tag">¥22</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">24g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">24g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">42g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1208mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">154mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">2029kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍗</div>
+                    <span class="calorie-badge">391 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">板烧鸡腿堡</span>
+                            <span class="price-tag">¥23</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">23g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">17g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">35g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1041mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">93mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1638kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🧀</div>
+                    <span class="calorie-badge">429 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">双层吉士汉堡</span>
+                            <span class="price-tag">¥21</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">27g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">22g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">31g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1017mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">232mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1796kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🐟</div>
+                    <span class="calorie-badge">325 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">麦香鱼</span>
+                            <span class="price-tag">¥19</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">16g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">13g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">35g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">556mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">99mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1359kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 小食系列 -->
+        <div class="category-section" data-category="snack">
+            <h2 class="category-title">🍟 小食系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">🍟</div>
+                    <span class="calorie-badge">289 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">中薯条</span>
+                            <span class="price-tag">¥12</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">4g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">38g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">165mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">18mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1210kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍗</div>
+                    <span class="calorie-badge">224 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">麦辣鸡翅(2块)</span>
+                            <span class="price-tag">¥11</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">13g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">15g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">9g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">537mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">13mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">937kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍖</div>
+                    <span class="calorie-badge">213 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">麦乐鸡(5块)</span>
+                            <span class="price-tag">¥13</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">13g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">422mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">9mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">890kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🥧</div>
+                    <span class="calorie-badge">232 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">香芋派</span>
+                            <span class="price-tag">¥8</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">2g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">28g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">159mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">7mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">971kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 饮品系列 -->
+        <div class="category-section" data-category="drink">
+            <h2 class="category-title">🥤 饮品系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">🥤</div>
+                    <span class="calorie-badge">147 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">可乐(中)</span>
+                            <span class="price-tag">¥11</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">36g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">10mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">616kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🥤</div>
+                    <span class="calorie-badge">0 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">无糖可口可乐(中)</span>
+                            <span class="price-tag">¥11</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">35mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🥛</div>
+                    <span class="calorie-badge">129 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">纯牛奶(盒装)</span>
+                            <span class="price-tag">¥10</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">7g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">7g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">10g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">73mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">231mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">541kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🌽</div>
+                    <span class="calorie-badge">87 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">玉米杯(大)</span>
+                            <span class="price-tag">¥12</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">4g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">2mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">10mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">365kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 甜品系列 -->
+        <div class="category-section" data-category="dessert">
+            <h2 class="category-title">🍦 甜品系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">🍦</div>
+                    <span class="calorie-badge">93 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">圆筒冰淇淋</span>
+                            <span class="price-tag">¥5</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">2g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">3g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">14g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">36mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">77mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">391kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍨</div>
+                    <span class="calorie-badge">282 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">朱古力新地</span>
+                            <span class="price-tag">¥12</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">5g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">9g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">44g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">126mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">182mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1178kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍓</div>
+                    <span class="calorie-badge">245 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">草莓新地</span>
+                            <span class="price-tag">¥12</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">4g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">6g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">43g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">84mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">158mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1027kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🌀</div>
+                    <span class="calorie-badge">266 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">奥利奥麦旋风</span>
+                            <span class="price-tag">¥14</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">5g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">9g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">40g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">116mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">185mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1115kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 咖啡系列 -->
+        <div class="category-section" data-category="coffee">
+            <h2 class="category-title">☕ 咖啡系列</h2>
+            <div class="menu-grid">
+                <div class="menu-card">
+                    <div class="card-image">☕</div>
+                    <span class="calorie-badge">13 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">鲜萃咖啡(大)</span>
+                            <span class="price-tag">¥15</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">0g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">3mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">8mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">54kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🥛</div>
+                    <span class="calorie-badge">162 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">冰奶铁(大)</span>
+                            <span class="price-tag">¥18</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">9g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">7g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">15g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">85mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">275mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">678kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍵</div>
+                    <span class="calorie-badge">339 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">浓浓抹茶雪冰(大)</span>
+                            <span class="price-tag">¥22</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">8g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">12g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">48g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">194mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">270mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1418kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-card">
+                    <div class="card-image">🍫</div>
+                    <span class="calorie-badge">444 kcal</span>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <span class="food-name">浓浓黑巧雪冰(大)</span>
+                            <span class="price-tag">¥22</span>
+                        </div>
+                        <div class="nutrition-grid">
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">11g</div>
+                                <div class="nutrition-label">蛋白质</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">14g</div>
+                                <div class="nutrition-label">脂肪</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">65g</div>
+                                <div class="nutrition-label">碳水</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">258mg</div>
+                                <div class="nutrition-label">钠</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">251mg</div>
+                                <div class="nutrition-label">钙</div>
+                            </div>
+                            <div class="nutrition-item">
+                                <div class="nutrition-value">1857kJ</div>
+                                <div class="nutrition-label">能量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 营养成分汇总表 -->
+    <div class="category-section" style="margin-top: 50px;">
+        <h2 class="category-title">📊 营养成分参考表</h2>
+        <div style="background: white; padding: 30px; border-radius: 20px; overflow-x: auto;">
+            <table class="nutrition-table">
+                <thead>
+                    <tr>
+                        <th>餐品名称</th>
+                        <th>价格</th>
+                        <th>热量(kcal)</th>
+                        <th>蛋白质(g)</th>
+                        <th>脂肪(g)</th>
+                        <th>碳水(g)</th>
+                        <th>钠(mg)</th>
+                        <th>钙(mg)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>巨无霸</td><td>¥25</td><td>513</td><td>27</td><td>26</td><td>42</td><td>961</td><td>171</td></tr>
+                    <tr><td>麦辣鸡腿汉堡</td><td>¥22</td><td>485</td><td>24</td><td>24</td><td>42</td><td>1208</td><td>154</td></tr>
+                    <tr><td>板烧鸡腿堡</td><td>¥23</td><td>391</td><td>23</td><td>17</td><td>35</td><td>1041</td><td>93</td></tr>
+                    <tr><td>双层吉士汉堡</td><td>¥21</td><td>429</td><td>27</td><td>22</td><td>31</td><td>1017</td><td>232</td></tr>
+                    <tr><td>麦香鱼</td><td>¥19</td><td>325</td><td>16</td><td>13</td><td>35</td><td>556</td><td>99</td></tr>
+                    <tr><td>中薯条</td><td>¥12</td><td>289</td><td>4</td><td>12</td><td>38</td><td>165</td><td>18</td></tr>
+                    <tr><td>麦辣鸡翅(2块)</td><td>¥11</td><td>224</td><td>13</td><td>15</td><td>9</td><td>537</td><td>13</td></tr>
+                    <tr><td>麦乐鸡(5块)</td><td>¥13</td><td>213</td><td>12</td><td>12</td><td>13</td><td>422</td><td>9</td></tr>
+                    <tr><td>可乐(中)</td><td>¥11</td><td>147</td><td>0</td><td>0</td><td>36</td><td>0</td><td>10</td></tr>
+                    <tr><td>无糖可乐(中)</td><td>¥11</td><td>0</td><td>0</td><td>0</td><td>1</td><td>35</td><td>0</td></tr>
+                    <tr><td>圆筒冰淇淋</td><td>¥5</td><td>93</td><td>2</td><td>3</td><td>14</td><td>36</td><td>77</td></tr>
+                    <tr><td>朱古力新地</td><td>¥12</td><td>282</td><td>5</td><td>9</td><td>44</td><td>126</td><td>182</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🍟 麦当劳营养菜单 | McDonald's Nutrition Menu</p>
+        <p>数据来源：McDonald's MCP Server | 页面生成时间：2026-03-09</p>
+        <p style="margin-top: 10px; font-size: 0.9em; color: #999;">
+            营养成分仅供参考，实际产品可能因地区、季节等因素有所差异
+        </p>
+    </div>
+
+    <script>
+        function filterCategory(category) {
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 显示/隐藏分类
+            const sections = document.querySelectorAll('.category-section');
+            sections.forEach(section => {
+                if (category === 'all' || section.dataset.category === category) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

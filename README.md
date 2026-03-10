@@ -18,5 +18,10 @@ An interactive, responsive, and visual McDonald's menu that displays nutritional
    ```
 3. Open `http://localhost:8080/mcdonalds_menu.html` in your browser.
 
+## Contributors
+
+- **daruizi** ([@daruizi](https://github.com/daruizi)) - Project idea and direction.
+- **Gemini CLI (AI Agent)** - Responsible for React + TypeScript refactoring, real-time McDonald's MCP data integration, and UI/UX optimization.
+
 ## Data Source
 The data is structured based on the McDonald's MCP Server. Nutritional facts are for reference only.
